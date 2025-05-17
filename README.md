@@ -99,5 +99,3 @@
 | GET    | `/user/profile`        | USER / ADMIN |
 | GET    | `/admin/dashboard`     | ADMIN        |
 
-
-```
