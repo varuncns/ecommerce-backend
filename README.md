@@ -89,6 +89,16 @@
 
 ---
 
+###✅ Milestone 5: Product Module (Create + Read)
+
+* Introduced Product entity with fields: productCode, name, price, stock, etc.
+* POST /admin/products → Admins can create new products
+* GET /products → Public can view all products
+* Enforced uniqueness using productCode
+* Validated access control: only admins can create; public can read
+* Added business logic layer to prevent duplicates
+* All tests passed: secure, clean, and public-facing
+
 ## 📮 API Endpoints (Completed)
 
 | Method | Endpoint               | Access       |
@@ -98,4 +108,6 @@
 | POST   | `/auth/admin/register` | Public       |
 | GET    | `/user/profile`        | USER / ADMIN |
 | GET    | `/admin/dashboard`     | ADMIN        |
+|POST	   |`/admin/products	`      |ADMIN         |
+|GET	   | `/products`	          |Public        |
 
