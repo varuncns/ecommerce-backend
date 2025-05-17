@@ -17,7 +17,7 @@
 - MySQL (locally or Docker)
 - Postman / curl
 - Git installed
-- IDE like IntelliJ or VS Code
+- IDE like IntelliJ or Eclipse
 
 ---
 
