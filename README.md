@@ -89,7 +89,7 @@
 
 ---
 
-###✅ Milestone 5: Product Module (Create + Read)
+### Milestone 5: Product Module (Create + Read)
 
 * Introduced Product entity with fields: productCode, name, price, stock, etc.
 * POST /admin/products → Admins can create new products
