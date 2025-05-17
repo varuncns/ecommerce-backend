@@ -14,5 +14,5 @@
 .DS_Store
 
 # Sensitive
-application.properties
+#application.properties
 
