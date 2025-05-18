@@ -1,0 +1,23 @@
+steps:
+  - name: 'gcr.io/cloud-builders/mvn'
+    entrypoint: 'mvn'
+    args: ['clean', 'package', '-DskipTests']
+
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['build', '-t', 'gcr.io/genuine-plating-460205-h2/ecommerce-backend', '.']
+
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['push', 'gcr.io/genuine-plating-460205-h2/ecommerce-backend']
+
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    entrypoint: gcloud
+    args: [
+      'run', 'deploy', 'ecommerce-backend',
+      '--image', 'gcr.io/genuine-plating-460205-h2/ecommerce-backend',
+      '--region', 'us-central1',
+      '--platform', 'managed',
+      '--allow-unauthenticated'
+    ]
+
+images:
+  - 'gcr.io/genuine-plating-460205-h2/ecommerce-backend'
