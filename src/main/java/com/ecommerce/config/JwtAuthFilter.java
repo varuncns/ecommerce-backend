@@ -13,6 +13,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 import java.io.IOException;
+import java.util.List;
 
 @Component
 public class JwtAuthFilter extends OncePerRequestFilter {
@@ -22,12 +23,34 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
     @Autowired
     private UserDetailsServiceImpl userDetailsService;
+    private static final List<String> WHITELIST = List.of(
+    	    "/auth",
+    	    "/v2/api-docs",
+    	    "/v3/api-docs",
+    	    "/swagger-ui",
+    	    "/swagger-ui.html",
+    	    "/swagger-resources",
+    	    "/webjars",
+    	    "/favicon.ico",
+    	    "/productsAll"
+    	);
+
+    	private boolean isWhitelistedPath(String path) {
+    	    return WHITELIST.stream().anyMatch(path::startsWith);
+    	}
+    	
 
     @Override
     protected void doFilterInternal(HttpServletRequest request,
                                     HttpServletResponse response,
                                     FilterChain filterChain)
                                     throws ServletException, IOException {
+    	
+    	String path = request.getRequestURI();
+        if (isWhitelistedPath(path)) {
+            filterChain.doFilter(request, response);
+            return;
+        }
 
         final String authHeader = request.getHeader("Authorization");
 
