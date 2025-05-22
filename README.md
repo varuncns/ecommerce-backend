@@ -98,7 +98,7 @@ Backend is deployed to **Google Cloud Run**:
 
 - Category Entity & API endpoints added
 - Product entity linked with Category via @ManyToOne
-- /products/by-category?category=Phones added
+- `GET /products/by-category?category=Phones` added
 - Pagination, sorting, and keyword filtering in /products
 - Circular reference fix using @JsonIgnore
 
