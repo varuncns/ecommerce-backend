@@ -94,6 +94,14 @@ Backend is deployed to **Google Cloud Run**:
 - MySQL hosted on **Cloud SQL**
 - Image pushed to **Artifact Registry**
 
+## 🏁 Milestone 8 – Product & Category Integration + Pagination Support
+
+- Category Entity & API endpoints added
+- Product entity linked with Category via @ManyToOne
+- /products/by-category?category=Phones added
+- Pagination, sorting, and keyword filtering in /products
+- Circular reference fix using @JsonIgnore
+
 ### Deployment Architecture
 
 ```
