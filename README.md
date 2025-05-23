@@ -1,19 +1,20 @@
 # 🛒 E-commerce Backend
 
-A robust and modular e-commerce backend built with **Spring Boot**, **MySQL**, and **JWT-based authentication**. Supports admin and user roles with full CRUD for product management.
+A robust, modular, and production-ready backend for e-commerce platforms, built with **Spring Boot**, **MySQL**, and **JWT-based authentication**. The backend supports both admin and user roles, full CRUD for products, order management, cart functionality, and is cloud-ready for scalable deployments.
 
 ---
 
 ## 🚀 Tech Stack
 
-- Java 21
-- Spring Boot 3.4.5
-- Spring Security + JWT
-- Hibernate (JPA) + MySQL
-- Maven
-- Swagger (OpenAPI via Springdoc)
-- Docker (upcoming)
-- Google Cloud Platform (✅ Milestone 7)
+- **Java 21**
+- **Spring Boot 3.4.5**
+- **Spring Security** (JWT-based authentication)
+- **Hibernate (JPA)** & **MySQL**
+- **Maven**
+- **Swagger (OpenAPI via Springdoc)**
+- **Docker** (deployment-ready)
+- **Google Cloud Platform** (Cloud SQL, Cloud Run)
+- **CI/CD** (planned)
 
 ---
 
@@ -21,15 +22,15 @@ A robust and modular e-commerce backend built with **Spring Boot**, **MySQL**, a
 
 - Java 17+ or 21
 - MySQL (local or GCP Cloud SQL)
-- Postman or curl for API testing
 - Git
-- IDE (IntelliJ, VS Code)
+- IDE (IntelliJ, VS Code, etc.)
+- [Postman](https://www.postman.com/) or `curl` for API testing
 
 ---
 
 ## 🧪 Local Setup
 
-### 1. Clone the repository
+### 1. Clone the Repository
 
 ```bash
 git clone https://github.com/varuncns/ecommerce-backend.git
@@ -38,7 +39,8 @@ cd ecommerce-backend
 
 ### 2. Configure MySQL
 
-Create a schema named `ecommerce_db` and update credentials in your `application.properties`:
+- Create a database/schema named `ecommerce_db`.
+- Update credentials in `src/main/resources/application.properties`:
 
 ```properties
 spring.datasource.url=jdbc:mysql://localhost:3306/ecommerce_db
@@ -47,62 +49,86 @@ spring.datasource.password=your_password
 spring.jpa.hibernate.ddl-auto=update
 ```
 
-### 3. Run the application
+### 3. Build & Run the Application
 
 ```bash
 ./mvnw spring-boot:run
 ```
 
-Swagger UI will be available at [http://localhost:8080/swagger-ui.html](http://localhost:8080/swagger-ui.html).
+- Swagger UI: [http://localhost:8080/swagger-ui.html](http://localhost:8080/swagger-ui.html)
+
+---
+
+## 🗂️ Major Features
+
+- **User & Admin Registration/Login** (`/auth/register`, `/auth/login`, `/auth/admin/register`)
+- **JWT-based Authentication** & Stateless Sessions
+- **Role-Based Access Control** (`ROLE_USER`, `ROLE_ADMIN`)
+- **Product Management** (`/admin/products` CRUD)
+- **Category Management** (`/admin/categories`, `/products/by-category`)
+- **Cart & Order Management** (add/remove items, place orders, order history)
+- **Pagination, Sorting, Filtering** for product listings
+- **Swagger API Docs** with JWT support
 
 ---
 
 ## ✅ Milestone Progress
 
-### 🔹 Milestone 1 – Project Initialization
-- Spring Boot setup with MySQL integration
-- Git version control and project scaffolding
+### Milestone 1: Project Initialization
+- Spring Boot setup, MySQL integration
 
-### 🔹 Milestone 2 – JWT Authentication
-- `/auth/register`, `/auth/login` with password hashing
-- JWT token generation and stateless authentication
+### Milestone 2: JWT Authentication
+- Secure login/registration, password hashing
 
-### 🔹 Milestone 3 – Role-Based Access Control
-- Defined `ROLE_USER` and `ROLE_ADMIN`
-- Secured `/admin/**` endpoints using Spring Security
+### Milestone 3: Role-Based Access Control
+- User/admin roles, secure routes
 
-### 🔹 Milestone 4 – Admin API & Registration
-- Admin registration endpoint (`/auth/admin/register`)
-- Admin-only dashboard endpoint (`/admin/dashboard`)
+### Milestone 4: Admin API & Registration
+- Admin dashboard, admin registration
 
-### 🔹 Milestone 5 – Product Management
-- `POST /admin/products` to create products
-- `GET /admin/products/all` for listing
-- Enforced unique `productCode`
+### Milestone 5: Product Management
+- Create, list, update, delete products (admin-only)
 
-### 🔹 Milestone 6 – Product Update/Delete + Swagger
-- `PUT /admin/products` to update
-- `DELETE /admin/products/{id}` to delete
-- Swagger UI with JWT support and endpoint grouping
+### Milestone 6: Swagger & Enhanced Product API
+- REST docs via Swagger, JWT integration
+
+### Milestone 7: Google Cloud Deployment
+- Dockerized app, Cloud SQL, Artifact Registry, Cloud Run
+
+### Milestone 8: Categories, Pagination, Filtering
+- Product-category linking, new endpoints, circular reference fixes
+
+### Milestone 9: Cart & Order Management
+- Cart and Order entities, endpoints, and logic
 
 ---
 
-## ☁️ Milestone 7 – Deployment on Google Cloud Platform
+## 🛒 Cart Management
 
-Backend is deployed to **Google Cloud Run**:
-- Dockerized Spring Boot app
-- MySQL hosted on **Cloud SQL**
-- Image pushed to **Artifact Registry**
+- Each user has one cart.
+- Endpoints:
+  - `POST /cart/add` – Add product to cart
+  - `GET /cart` – View cart
+  - `DELETE /cart/remove/{productId}` – Decrease quantity
+  - `DELETE /cart/remove-all/{productId}` – Remove item
+- Cart is cleared automatically after order placement.
 
-## 🏁 Milestone 8 – Product & Category Integration + Pagination Support
+## 📦 Order Management
 
-- Category Entity & API endpoints added
-- Product entity linked with Category via @ManyToOne
-- `GET /products/by-category?category=Phones` added
-- Pagination, sorting, and keyword filtering in /products
-- Circular reference fix using @JsonIgnore
+- Place order directly from cart.
+- Order includes total, timestamp, and item details.
+- Status: `PENDING`, `PAID`, `SHIPPED`, `DELIVERED`, `CANCELLED`
+- Endpoints:
+  - `POST /order/place` – Place order
+  - `GET /order/history` – Order history
+  - `GET /order/{id}` – Order details
+  - `PATCH /order/status/{id}?status=...` – Update status (admin only)
 
-### Deployment Architecture
+---
+
+## ☁️ Cloud Deployment
+
+### Architecture
 
 ```
 Cloud Run ↔ Docker Image ↔ Artifact Registry
@@ -112,17 +138,18 @@ Cloud Run ↔ Docker Image ↔ Artifact Registry
 
 ### GCP Setup Steps
 
-#### 1. Enable APIs
+#### 1. Enable Required APIs
 
 ```bash
 gcloud services enable run.googleapis.com sqladmin.googleapis.com artifactregistry.googleapis.com
 ```
 
-#### 2. Create Cloud SQL (MySQL)
-- Create database: `ecommerce_db`
-- Add public IP authorized network: `0.0.0.0/0` (temporary for testing)
+#### 2. Create Cloud SQL (MySQL) Instance
 
-#### 3. Dockerfile Configuration
+- Create database: `ecommerce_db`
+- (For testing) Add authorized network: `0.0.0.0/0`
+
+#### 3. Dockerfile Example
 
 ```dockerfile
 FROM eclipse-temurin:21-jdk
@@ -132,7 +159,7 @@ EXPOSE 8080
 ENTRYPOINT ["sh", "-c", "java -Dspring.profiles.active=cloud -Dserver.port=$PORT -jar app.jar"]
 ```
 
-#### 4. Build & Push to Artifact Registry
+#### 4. Build & Push Image
 
 ```bash
 docker buildx create --use
@@ -153,32 +180,33 @@ gcloud run deploy ecommerce-backend \
   --set-env-vars=SPRING_PROFILES_ACTIVE=cloud
 ```
 
-#### 6. Verify
+#### 6. Verify Deployment
 
-Once deployed, access the app via:
+Access the app:
 
 ```
 https://ecommerce-backend-xxxxx.a.run.app
 ```
 
-Test endpoints using Postman or Swagger UI (secured routes require JWT token).
+Test endpoints via Swagger UI or Postman (secured routes require JWT token).
 
 ---
 
-## 📚 API Docs (Swagger UI)
+## 📚 API Documentation
 
 - **Local:** [http://localhost:8080/swagger-ui.html](http://localhost:8080/swagger-ui.html)
 - **Cloud:** `https://<your-cloud-url>/swagger-ui.html`
-- Use `Bearer <JWT>` to test secured endpoints
+- Use `Bearer <JWT>` in your requests for secured endpoints.
 
 ---
 
-## 🔜 Upcoming: Milestones – Dockerization & CI/CD & Features like Cart, Order others
+## 🔜 Upcoming Features
 
-- GitHub Actions or Cloud Build for auto-deploy
+- CI/CD: GitHub Actions or Cloud Build
 - Private Docker registry integration
-- End-to-end CI/CD setup with commit-based deployment
-- Public APIs
+- End-to-end CI/CD with commit-based deployment
+- More public APIs
+- Enhanced test coverage
 
 ---
 
@@ -186,7 +214,7 @@ Test endpoints using Postman or Swagger UI (secured routes require JWT token).
 
 **Varun CNS**  
 Java | Spring Boot | Cloud Native Development  
-[GitHub](https://github.com/varuncns)
+- [GitHub](https://github.com/varuncns)
 
 ---
 
