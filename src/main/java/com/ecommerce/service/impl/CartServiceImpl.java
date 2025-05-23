@@ -50,7 +50,7 @@ public class CartServiceImpl implements CartService {
     public Cart getUserCart(String email) {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("User not found"));
-        return cartRepository.findByUserId(user.getId())
+        return cartRepository.findByUserIdWithItems(user.getId())
                 .orElseThrow(() -> new RuntimeException("Cart not found"));
     }
 
