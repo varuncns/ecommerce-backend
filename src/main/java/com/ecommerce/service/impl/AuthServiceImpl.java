@@ -9,11 +9,14 @@ import com.ecommerce.repository.RoleRepository;
 import com.ecommerce.repository.UserRepository;
 import com.ecommerce.service.AuthService;
 import com.ecommerce.utils.JwtUtils;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.Collections;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class AuthServiceImpl implements AuthService {
@@ -47,7 +50,11 @@ public class AuthServiceImpl implements AuthService {
 
         userRepository.save(user);
 
-        String token = jwtUtils.generateToken(user.getEmail());
+        String token = jwtUtils.generateToken(
+            user.getEmail(),
+            convertRolesToAuthorities(user.getRoles())
+        );
+
         return new AuthResponse(token);
     }
 
@@ -60,9 +67,14 @@ public class AuthServiceImpl implements AuthService {
             throw new RuntimeException("Invalid credentials");
         }
 
-        String token = jwtUtils.generateToken(user.getEmail());
+        String token = jwtUtils.generateToken(
+            user.getEmail(),
+            convertRolesToAuthorities(user.getRoles())
+        );
+
         return new AuthResponse(token);
     }
+
     @Override
     public AuthResponse registerAdmin(RegisterRequest request) {
         if (userRepository.existsByEmail(request.getEmail())) {
@@ -70,7 +82,7 @@ public class AuthServiceImpl implements AuthService {
         }
 
         Role adminRole = roleRepository.findByName("ROLE_ADMIN")
-            .orElseThrow(() -> new RuntimeException("Admin role not found"));
+                .orElseThrow(() -> new RuntimeException("Admin role not found"));
 
         User user = new User();
         user.setName(request.getName());
@@ -80,8 +92,18 @@ public class AuthServiceImpl implements AuthService {
 
         userRepository.save(user);
 
-        String token = jwtUtils.generateToken(user.getEmail());
+        String token = jwtUtils.generateToken(
+            user.getEmail(),
+            convertRolesToAuthorities(user.getRoles())
+        );
+
         return new AuthResponse(token);
     }
 
+    // Helper to convert Set<Role> to Collection<GrantedAuthority>
+    private Collection<? extends GrantedAuthority> convertRolesToAuthorities(Set<Role> roles) {
+        return roles.stream()
+                .map(role -> (GrantedAuthority) () -> role.getName())
+                .collect(Collectors.toList());
+    }
 }

@@ -3,12 +3,14 @@ package com.ecommerce.utils;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
-
-import java.security.Key;
-import java.util.Date;
-
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import org.springframework.security.core.GrantedAuthority;
+
+import java.security.Key;
+import java.util.Collection;
+import java.util.Date;
+import java.util.stream.Collectors;
 
 @Component
 public class JwtUtils {
@@ -16,11 +18,14 @@ public class JwtUtils {
     @Value("${jwt.expirationMs}")
     private int jwtExpirationMs;
 
-    private final Key key = Keys.secretKeyFor(SignatureAlgorithm.HS512); // auto-secure key (256+ bits)
+    private final Key key = Keys.secretKeyFor(SignatureAlgorithm.HS512);
 
-    public String generateToken(String username) {
+    public String generateToken(String username, Collection<? extends GrantedAuthority> authorities) {
         return Jwts.builder()
                 .setSubject(username)
+                .claim("roles", authorities.stream()
+                        .map(GrantedAuthority::getAuthority)
+                        .collect(Collectors.toList()))
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + jwtExpirationMs))
                 .signWith(key)

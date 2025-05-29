@@ -1,7 +1,7 @@
 package com.ecommerce.controller;
-import com.ecommerce.entity.Product;
-import com.ecommerce.service.ProductService;
 
+import com.ecommerce.dto.ProductDTO;
+import com.ecommerce.service.ProductService;
 import jakarta.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,75 +21,66 @@ public class ProductController {
     private ProductService productService;
 
     @PostMapping("/admin/products")
-    public ResponseEntity<Product> addProduct(@RequestBody Product product) {
-        Product savedProduct = productService.createProduct(product);
+    public ResponseEntity<ProductDTO> addProduct(@RequestBody @Valid ProductDTO productDTO) {
+        ProductDTO savedProduct = productService.createProduct(productDTO);
         return ResponseEntity.ok(savedProduct);
     }
 
-//    @GetMapping("/productsAll")
-//    public ResponseEntity<List<Product>> getAllProducts() {
-//        return ResponseEntity.ok(productService.getAllProducts());
-//    }
-    
     @PutMapping("/products")
-    public ResponseEntity<Product> updateProduct(@Valid @RequestBody Product request) {
-        return ResponseEntity.ok(productService.updateProduct(request.getId(), request));
+    public ResponseEntity<ProductDTO> updateProduct(@RequestBody @Valid ProductDTO productDTO) {
+        return ResponseEntity.ok(productService.updateProduct(productDTO.getId(), productDTO));
     }
 
     @DeleteMapping("/products")
-    public ResponseEntity<Void> deleteProduct(@RequestBody Product request) {
-        productService.deleteProduct(request.getId());
+    public ResponseEntity<Void> deleteProduct(@RequestBody ProductDTO productDTO) {
+        productService.deleteProduct(productDTO.getId());
         return ResponseEntity.noContent().build();
     }
-    
+
     @GetMapping("/products")
-    public ResponseEntity<Product> getProductById(@RequestBody Product request) {
-        return ResponseEntity.ok(productService.getProductById(request.getId()));
+    public ResponseEntity<ProductDTO> getProductById(@RequestBody ProductDTO productDTO) {
+        return ResponseEntity.ok(productService.getProductById(productDTO.getId()));
     }
+
     @GetMapping("/productsAll")
-    public ResponseEntity<Page<Product>> getAllProducts(
-        @RequestParam(defaultValue = "0") int page,
-        @RequestParam(defaultValue = "10") int size,
-        @RequestParam(defaultValue = "id") String sortBy,
-        @RequestParam(defaultValue = "asc") String direction,
-        @RequestParam(required = false) String keyword
+    public ResponseEntity<Page<ProductDTO>> getAllProducts(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "id") String sortBy,
+            @RequestParam(defaultValue = "asc") String direction,
+            @RequestParam(required = false) String keyword
     ) {
         Sort sort = direction.equalsIgnoreCase("desc") ? Sort.by(sortBy).descending() : Sort.by(sortBy).ascending();
         Pageable pageable = PageRequest.of(page, size, sort);
-
-        Page<Product> result = (keyword != null && !keyword.isEmpty()) ?
+        Page<ProductDTO> result = (keyword != null && !keyword.isEmpty()) ?
                 productService.searchProducts(keyword, pageable) :
                 productService.getAllProducts(pageable);
-
         return ResponseEntity.ok(result);
     }
+
     @GetMapping("/search")
-    public ResponseEntity<Page<Product>> searchProducts(
-        @RequestParam String keyword,
-        @RequestParam(defaultValue = "0") int page,
-        @RequestParam(defaultValue = "10") int size,
-        @RequestParam(defaultValue = "id") String sortBy,
-        @RequestParam(defaultValue = "asc") String direction
+    public ResponseEntity<Page<ProductDTO>> searchProducts(
+            @RequestParam String keyword,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "id") String sortBy,
+            @RequestParam(defaultValue = "asc") String direction
     ) {
         Sort sort = direction.equalsIgnoreCase("desc") ? Sort.by(sortBy).descending() : Sort.by(sortBy).ascending();
         Pageable pageable = PageRequest.of(page, size, sort);
-
-        Page<Product> result = productService.searchProducts(keyword, pageable);
-        return ResponseEntity.ok(result);
+        return ResponseEntity.ok(productService.searchProducts(keyword, pageable));
     }
-    
+
     @GetMapping("/by-category")
-    public ResponseEntity<Page<Product>> getProductsByCategory(
-        @RequestParam String category,
-        @RequestParam(defaultValue = "0") int page,
-        @RequestParam(defaultValue = "10") int size,
-        @RequestParam(defaultValue = "id") String sortBy,
-        @RequestParam(defaultValue = "asc") String direction
+    public ResponseEntity<Page<ProductDTO>> getProductsByCategory(
+            @RequestParam String category,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "id") String sortBy,
+            @RequestParam(defaultValue = "asc") String direction
     ) {
         Sort sort = direction.equalsIgnoreCase("desc") ? Sort.by(sortBy).descending() : Sort.by(sortBy).ascending();
         Pageable pageable = PageRequest.of(page, size, sort);
-        Page<Product> result = productService.getProductsByCategory(category, pageable);
-        return ResponseEntity.ok(result);
+        return ResponseEntity.ok(productService.getProductsByCategory(category, pageable));
     }
-
 }

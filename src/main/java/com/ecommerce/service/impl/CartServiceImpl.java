@@ -1,11 +1,14 @@
 package com.ecommerce.service.impl;
 
+import com.ecommerce.dto.CartDTO;
+import com.ecommerce.dto.CartItemDTO;
 import com.ecommerce.entity.*;
 import com.ecommerce.repository.*;
 import com.ecommerce.service.CartService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -22,6 +25,24 @@ public class CartServiceImpl implements CartService {
 
     @Autowired
     private UserRepository userRepository;
+    
+    private CartDTO convertToDto(Cart cart) {
+        List<CartItemDTO> itemDTOs = cart.getItems().stream().map(item -> {
+            return new CartItemDTO(
+                item.getProduct().getId(),
+                item.getProduct().getName(),
+                item.getQuantity(),
+                item.getProduct().getPrice().doubleValue()
+            );
+        }).toList();
+
+        double total = itemDTOs.stream()
+            .mapToDouble(item -> item.getPrice() * item.getQuantity())
+            .sum();
+
+        return new CartDTO(cart.getId(), itemDTOs, total);
+    }
+
 
     @Override
     public void addProductToCart(String email, Long productId, int quantity) {
@@ -47,12 +68,15 @@ public class CartServiceImpl implements CartService {
     }
 
     @Override
-    public Cart getUserCart(String email) {
+    public CartDTO getUserCart(String email) {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("User not found"));
-        return cartRepository.findByUserIdWithItems(user.getId())
+        Cart cart = cartRepository.findByUserIdWithItems(user.getId())
                 .orElseThrow(() -> new RuntimeException("Cart not found"));
+
+        return convertToDto(cart);
     }
+
 
     @Override
     public void removeItemFromCart(String email, Long productId) {

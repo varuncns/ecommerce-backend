@@ -33,8 +33,8 @@ public class SecurityConfig {
 	                    "/swagger-ui.html",
 	                    "/swagger-resources/**",
 	                    "/webjars/**","/productsAll").permitAll()
+	        	.requestMatchers("/admin/**","/user/admin/**").hasRole("ADMIN")
 	            .requestMatchers("/user/**").hasRole("USER")
-	            .requestMatchers("/admin/**").hasRole("ADMIN")
 	            .anyRequest().authenticated()
 	        ).exceptionHandling(ex -> ex
 	                .authenticationEntryPoint(jwtAuthenticationEntryPoint)

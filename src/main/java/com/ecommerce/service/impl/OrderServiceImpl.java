@@ -1,5 +1,7 @@
 package com.ecommerce.service.impl;
 
+import com.ecommerce.dto.OrderDTO;
+import com.ecommerce.dto.OrderItemDTO;
 import com.ecommerce.entity.*;
 import com.ecommerce.enums.OrderStatus;
 import com.ecommerce.repository.*;
@@ -12,6 +14,7 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class OrderServiceImpl implements OrderService {
@@ -33,7 +36,7 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     @Transactional
-    public Order placeOrder(String userEmail) {
+    public OrderDTO placeOrder(String userEmail) {
         User user = userRepository.findByEmail(userEmail)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
@@ -77,19 +80,23 @@ public class OrderServiceImpl implements OrderService {
 
         cartItemRepository.deleteByCartId(cart.getId());
         cart.getItems().clear();
-        return savedOrder;
+
+        return toOrderDTO(savedOrder);
     }
 
     @Override
-    public List<Order> getUserOrders(String userEmail) {
+    public List<OrderDTO> getUserOrders(String userEmail) {
         User user = userRepository.findByEmail(userEmail)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
-        return orderRepository.findByUserId(user.getId());
+        return orderRepository.findByUserId(user.getId())
+                .stream()
+                .map(this::toOrderDTO)
+                .collect(Collectors.toList());
     }
 
     @Override
-    public Order getOrderById(Long orderId, String userEmail) {
+    public OrderDTO getOrderById(Long orderId, String userEmail) {
         User user = userRepository.findByEmail(userEmail)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
@@ -100,7 +107,7 @@ public class OrderServiceImpl implements OrderService {
             throw new RuntimeException("Unauthorized access to order");
         }
 
-        return order;
+        return toOrderDTO(order);
     }
     
     @Override
@@ -133,6 +140,26 @@ public class OrderServiceImpl implements OrderService {
             case DELIVERED, CANCELLED -> false;
         };
     }
+    
+    private OrderDTO toOrderDTO(Order order) {
+        List<OrderItemDTO> itemDTOs = order.getItems().stream()
+                .map(item -> OrderItemDTO.builder()
+                        .productId(item.getProduct().getId())
+                        .productName(item.getProduct().getName())
+                        .quantity(item.getQuantity())
+                        .priceAtPurchase(item.getPriceAtPurchase())
+                        .build())
+                .collect(Collectors.toList());
+
+        return OrderDTO.builder()
+                .id(order.getId())
+                .createdAt(order.getCreatedAt())
+                .totalPrice(order.getTotalPrice())
+                .status(order.getStatus().name())
+                .items(itemDTOs)
+                .build();
+    }
+
 
 
 

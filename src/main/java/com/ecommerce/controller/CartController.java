@@ -1,5 +1,6 @@
 package com.ecommerce.controller;
 
+import com.ecommerce.dto.CartDTO;
 import com.ecommerce.entity.Cart;
 import com.ecommerce.service.CartService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,7 +27,7 @@ public class CartController {
     }
 
     @GetMapping
-    public ResponseEntity<Cart> getCart(@AuthenticationPrincipal UserDetails userDetails) {
+    public ResponseEntity<CartDTO> getCart(@AuthenticationPrincipal UserDetails userDetails) {
         return ResponseEntity.ok(cartService.getUserCart(userDetails.getUsername()));
     }
 

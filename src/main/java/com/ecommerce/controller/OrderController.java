@@ -1,5 +1,6 @@
 package com.ecommerce.controller;
 
+import com.ecommerce.dto.OrderDTO;
 import com.ecommerce.entity.Order;
 import com.ecommerce.service.OrderService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,23 +20,23 @@ public class OrderController {
     private OrderService orderService;
 
     @PostMapping("/place")
-    public ResponseEntity<Order> placeOrder(@AuthenticationPrincipal UserDetails userDetails) {
-        Order order = orderService.placeOrder(userDetails.getUsername());
+    public ResponseEntity<OrderDTO> placeOrder(@AuthenticationPrincipal UserDetails userDetails) {
+        OrderDTO order = orderService.placeOrder(userDetails.getUsername());
         return ResponseEntity.ok(order);
     }
 
     @GetMapping("/history")
-    public ResponseEntity<List<Order>> getOrderHistory(@AuthenticationPrincipal UserDetails userDetails) {
-        List<Order> orders = orderService.getUserOrders(userDetails.getUsername());
+    public ResponseEntity<List<OrderDTO>> getOrderHistory(@AuthenticationPrincipal UserDetails userDetails) {
+        List<OrderDTO> orders = orderService.getUserOrders(userDetails.getUsername());
         return ResponseEntity.ok(orders);
     }
 
     @GetMapping("/{orderId}")
-    public ResponseEntity<Order> getOrderById(
+    public ResponseEntity<OrderDTO> getOrderById(
             @PathVariable Long orderId,
             @AuthenticationPrincipal UserDetails userDetails
     ) {
-        Order order = orderService.getOrderById(orderId, userDetails.getUsername());
+        OrderDTO order = orderService.getOrderById(orderId, userDetails.getUsername());
         return ResponseEntity.ok(order);
     }
     
