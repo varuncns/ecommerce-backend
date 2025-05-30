@@ -1,18 +1,22 @@
-# Build
-/target
+# Build artifacts
+/target/
 *.class
 
-# IDE
+# IDE configurations
 .idea/
 *.iml
 .vscode/
 
 # Logs
 *.log
+logs/
 
-# OS
+# OS-specific files
 .DS_Store
+Thumbs.db
 
-# Sensitive
-#application.properties
-
+# Sensitive configuration
+application-local.properties
+application-cloud.properties
+application-prod.properties
+.env
