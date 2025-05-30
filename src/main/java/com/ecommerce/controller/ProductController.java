@@ -1,6 +1,7 @@
 package com.ecommerce.controller;
 
 import com.ecommerce.dto.ProductDTO;
+import com.ecommerce.dto.ProductPublicDTO;
 import com.ecommerce.service.ProductService;
 import jakarta.validation.Valid;
 
@@ -10,6 +11,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -43,7 +45,7 @@ public class ProductController {
     }
 
     @GetMapping("/productsAll")
-    public ResponseEntity<Page<ProductDTO>> getAllProducts(
+    public ResponseEntity<Page<ProductPublicDTO>> getAllProducts(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
             @RequestParam(defaultValue = "id") String sortBy,
@@ -52,14 +54,14 @@ public class ProductController {
     ) {
         Sort sort = direction.equalsIgnoreCase("desc") ? Sort.by(sortBy).descending() : Sort.by(sortBy).ascending();
         Pageable pageable = PageRequest.of(page, size, sort);
-        Page<ProductDTO> result = (keyword != null && !keyword.isEmpty()) ?
+        Page<ProductPublicDTO> result = (keyword != null && !keyword.isEmpty()) ?
                 productService.searchProducts(keyword, pageable) :
                 productService.getAllProducts(pageable);
         return ResponseEntity.ok(result);
     }
 
     @GetMapping("/search")
-    public ResponseEntity<Page<ProductDTO>> searchProducts(
+    public ResponseEntity<Page<ProductPublicDTO>> searchProducts(
             @RequestParam String keyword,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
@@ -72,7 +74,7 @@ public class ProductController {
     }
 
     @GetMapping("/by-category")
-    public ResponseEntity<Page<ProductDTO>> getProductsByCategory(
+    public ResponseEntity<Page<ProductPublicDTO>> getProductsByCategory(
             @RequestParam String category,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
@@ -83,4 +85,16 @@ public class ProductController {
         Pageable pageable = PageRequest.of(page, size, sort);
         return ResponseEntity.ok(productService.getProductsByCategory(category, pageable));
     }
+
+    
+    @PatchMapping("/admin/products/{productId}/stock")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<String> updateStock(
+            @PathVariable Long productId,
+            @RequestParam int newStock
+    ) {
+        productService.updateStock(productId, newStock);
+        return ResponseEntity.ok("Stock updated successfully");
+    }
+
 }

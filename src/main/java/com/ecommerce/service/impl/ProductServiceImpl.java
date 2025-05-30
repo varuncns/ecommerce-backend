@@ -1,6 +1,7 @@
 package com.ecommerce.service.impl;
 
 import com.ecommerce.dto.ProductDTO;
+import com.ecommerce.dto.ProductPublicDTO;
 import com.ecommerce.entity.Category;
 import com.ecommerce.entity.Product;
 import com.ecommerce.repository.CategoryRepository;
@@ -50,6 +51,16 @@ public class ProductServiceImpl implements ProductService {
                 product.getStock(),
                 product.getCategory().getName()
         );
+    }
+    
+    private ProductPublicDTO toPublicDto(Product product) {
+        return ProductPublicDTO.builder()
+                .id(product.getId())
+                .name(product.getName())
+                .description(product.getDescription())
+                .price(product.getPrice())
+                .category(product.getCategory().getName())
+                .build();
     }
 
     @Override
@@ -102,17 +113,26 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public Page<ProductDTO> getAllProducts(Pageable pageable) {
-        return productRepository.findAll(pageable).map(this::entityToDto);
+    public Page<ProductPublicDTO> getAllProducts(Pageable pageable) {
+        return productRepository.findAll(pageable).map(this::toPublicDto);
     }
 
     @Override
-    public Page<ProductDTO> searchProducts(String keyword, Pageable pageable) {
-        return productRepository.findByNameContainingIgnoreCase(keyword, pageable).map(this::entityToDto);
+    public Page<ProductPublicDTO> searchProducts(String keyword, Pageable pageable) {
+        return productRepository.findByNameContainingIgnoreCase(keyword, pageable).map(this::toPublicDto);
     }
 
     @Override
-    public Page<ProductDTO> getProductsByCategory(String categoryName, Pageable pageable) {
-        return productRepository.findByCategoryNameIgnoreCase(categoryName, pageable).map(this::entityToDto);
+    public Page<ProductPublicDTO> getProductsByCategory(String categoryName, Pageable pageable) {
+        return productRepository.findByCategoryNameIgnoreCase(categoryName, pageable).map(this::toPublicDto);
     }
+    
+    @Override
+    public void updateStock(Long productId, int newStock) {
+        Product product = productRepository.findById(productId)
+                .orElseThrow(() -> new RuntimeException("Product not found"));
+        product.setStock(newStock);
+        productRepository.save(product);
+    }
+
 }

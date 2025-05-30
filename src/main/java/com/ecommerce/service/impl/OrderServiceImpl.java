@@ -36,6 +36,8 @@ public class OrderServiceImpl implements OrderService {
     private OrderItemRepository orderItemRepository;
     @Autowired
     private AddressRepository addressRepository;
+    @Autowired
+    private ProductRepository productRepository;
 
     @Override
     @Transactional
@@ -46,7 +48,6 @@ public class OrderServiceImpl implements OrderService {
         Address address = addressRepository.findById(addressId)
                 .orElseThrow(() -> new RuntimeException("Address not found"));
 
-        // validate address belongs to user
         if (!address.getUser().getId().equals(user.getId())) {
             throw new RuntimeException("Unauthorized address usage");
         }
@@ -60,7 +61,7 @@ public class OrderServiceImpl implements OrderService {
 
         Order order = new Order();
         order.setUser(user);
-        order.setAddress(address); // 🔥 set address
+        order.setAddress(address);
         order.setCreatedAt(LocalDateTime.now());
         order.setStatus(OrderStatus.PENDING);
 
@@ -68,12 +69,22 @@ public class OrderServiceImpl implements OrderService {
         List<OrderItem> orderItems = new ArrayList<>();
 
         for (CartItem cartItem : cart.getItems()) {
-            BigDecimal price = cartItem.getProduct().getPrice();
+            Product product = cartItem.getProduct();
             int quantity = cartItem.getQuantity();
 
+            //  Stock check
+            if (product.getStock() < quantity) {
+                throw new RuntimeException("Not enough stock for product: " + product.getName());
+            }
+
+            //  Deduct stock
+            product.setStock(product.getStock() - quantity);
+            productRepository.save(product);
+
+            BigDecimal price = product.getPrice();
             OrderItem orderItem = OrderItem.builder()
                     .order(order)
-                    .product(cartItem.getProduct())
+                    .product(product)
                     .quantity(quantity)
                     .priceAtPurchase(price)
                     .build();
@@ -89,9 +100,11 @@ public class OrderServiceImpl implements OrderService {
         orderItemRepository.saveAll(orderItems);
 
         cartItemRepository.deleteByCartId(cart.getId());
+        cart.getItems().clear();
 
-        return toOrderDTO(saved); // with address mapping included
+        return toOrderDTO(saved);
     }
+
 
 
     @Override
