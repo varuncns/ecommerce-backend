@@ -17,6 +17,9 @@ import org.springframework.stereotype.Service;
 
 import java.util.*;
 import java.util.stream.Collectors;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 
 @Service
 public class AuthServiceImpl implements AuthService {
@@ -32,6 +35,9 @@ public class AuthServiceImpl implements AuthService {
 
     @Autowired
     private JwtUtils jwtUtils;
+    
+    private static final Logger logger = LoggerFactory.getLogger(AuthServiceImpl.class);
+
 
     @Override
     public AuthResponse register(RegisterRequest request) {
@@ -71,6 +77,11 @@ public class AuthServiceImpl implements AuthService {
             user.getEmail(),
             convertRolesToAuthorities(user.getRoles())
         );
+        
+
+        logger.info("Method someMethod() called");
+        logger.debug("Debugging with some value = {}", user.getEmail());
+        logger.error("An error occurred", user.getRoles());
 
         return new AuthResponse(token);
     }
