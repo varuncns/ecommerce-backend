@@ -8,6 +8,7 @@ import com.ecommerce.enums.OrderStatus;
 import com.ecommerce.repository.*;
 import com.ecommerce.service.OrderService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -38,7 +39,14 @@ public class OrderServiceImpl implements OrderService {
     private AddressRepository addressRepository;
     @Autowired
     private ProductRepository productRepository;
-
+    @Autowired
+    private EmailServiceImpl emailServiceImpl;
+    
+    @Value("${admin.email}")
+    private String adminEmail;
+    @Value("${app.name}")
+    private String appNameString;
+    
     @Override
     @Transactional
     public OrderDTO placeOrder(String email, Long addressId) {
@@ -101,7 +109,8 @@ public class OrderServiceImpl implements OrderService {
 
         cartItemRepository.deleteByCartId(cart.getId());
         cart.getItems().clear();
-
+        emailServiceImpl.sendOrderConfirmationToUser(user.getEmail(),user.getName(), saved.getId(),total.toPlainString(),appNameString);
+        emailServiceImpl.sendOrderNotificationToAdmin(adminEmail, user.getName(), saved.getId(),total.toPlainString(),appNameString);
         return toOrderDTO(saved);
     }
 
@@ -153,6 +162,9 @@ public class OrderServiceImpl implements OrderService {
 
         order.setStatus(newStatusEnum);
         orderRepository.save(order);
+        emailServiceImpl.sendOrderStatusUpdateToUser(order.getUser().getEmail(), order.getUser().getName(), orderId, newStatusEnum.name(),appNameString);
+        emailServiceImpl.sendOrderStatusUpdateToAdmin(adminEmail,order.getUser().getName(), orderId, newStatusEnum.name(),appNameString);
+
     }
     
     private boolean isValidStatusTransition(OrderStatus from, OrderStatus to) {

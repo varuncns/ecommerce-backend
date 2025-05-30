@@ -1,0 +1,10 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head><title>Order Confirmation</title></head>
+<body>
+	<h1 th:text="${appName}">Shopora</h1> 
+    <h2>Hi <span th:text="${userName}">User</span>,</h2>
+    <p>Your order <b>#<span th:text="${orderId}">12345</span></b> has been placed successfully.</p>
+    <p>Total Amount: ₹<span th:text="${total}">1000</span></p>
+</body>
+</html>

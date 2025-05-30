@@ -1,0 +1,12 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head><title>Order Status Changed</title></head>
+<body>
+	<h1 th:text="${appName}">Shopora</h1> 
+    <h2>Order Status Changed</h2>
+    <p>Order ID: <strong>#<span th:text="${orderId}">12345</span></strong></p>
+    <p>Updated By: System</p>
+    <p>User: <strong><span th:text="${userName}">John Doe</span></strong></p>
+    <p>New Status: <strong><span th:text="${status}">SHIPPED</span></strong></p>
+</body>
+</html>
