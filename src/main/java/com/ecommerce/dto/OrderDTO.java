@@ -16,4 +16,5 @@ public class OrderDTO {
     private BigDecimal totalPrice;
     private String status;
     private List<OrderItemDTO> items;
+    private AddressDTO address;
 }

@@ -20,8 +20,9 @@ public class OrderController {
     private OrderService orderService;
 
     @PostMapping("/place")
-    public ResponseEntity<OrderDTO> placeOrder(@AuthenticationPrincipal UserDetails userDetails) {
-        OrderDTO order = orderService.placeOrder(userDetails.getUsername());
+    public ResponseEntity<OrderDTO> placeOrder(@AuthenticationPrincipal UserDetails userDetails,@RequestParam Long addressId
+) {
+        OrderDTO order = orderService.placeOrder(userDetails.getUsername(), addressId);
         return ResponseEntity.ok(order);
     }
 

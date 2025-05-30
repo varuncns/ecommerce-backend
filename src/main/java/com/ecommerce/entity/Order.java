@@ -39,4 +39,8 @@ public class Order {
 
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL)
     private List<OrderItem> items = new ArrayList<>();
+    
+    @ManyToOne
+    @JoinColumn(name = "address_id")
+    private Address address;
 }

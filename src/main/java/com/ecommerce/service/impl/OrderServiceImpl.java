@@ -1,5 +1,6 @@
 package com.ecommerce.service.impl;
 
+import com.ecommerce.dto.AddressDTO;
 import com.ecommerce.dto.OrderDTO;
 import com.ecommerce.dto.OrderItemDTO;
 import com.ecommerce.entity.*;
@@ -33,37 +34,46 @@ public class OrderServiceImpl implements OrderService {
 
     @Autowired
     private OrderItemRepository orderItemRepository;
+    @Autowired
+    private AddressRepository addressRepository;
 
     @Override
     @Transactional
-    public OrderDTO placeOrder(String userEmail) {
-        User user = userRepository.findByEmail(userEmail)
+    public OrderDTO placeOrder(String email, Long addressId) {
+        User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
-        Cart cart = cartRepository.findByUserId(user.getId())
+        Address address = addressRepository.findById(addressId)
+                .orElseThrow(() -> new RuntimeException("Address not found"));
+
+        // validate address belongs to user
+        if (!address.getUser().getId().equals(user.getId())) {
+            throw new RuntimeException("Unauthorized address usage");
+        }
+
+        Cart cart = cartRepository.findByUserIdWithItems(user.getId())
                 .orElseThrow(() -> new RuntimeException("Cart not found"));
 
-        List<CartItem> cartItems = cart.getItems();
-        if (cartItems.isEmpty()) {
+        if (cart.getItems().isEmpty()) {
             throw new RuntimeException("Cart is empty");
         }
 
         Order order = new Order();
         order.setUser(user);
+        order.setAddress(address); // 🔥 set address
         order.setCreatedAt(LocalDateTime.now());
         order.setStatus(OrderStatus.PENDING);
 
         BigDecimal total = BigDecimal.ZERO;
         List<OrderItem> orderItems = new ArrayList<>();
 
-        for (CartItem cartItem : cartItems) {
-            Product product = cartItem.getProduct();
-            BigDecimal price = product.getPrice();
+        for (CartItem cartItem : cart.getItems()) {
+            BigDecimal price = cartItem.getProduct().getPrice();
             int quantity = cartItem.getQuantity();
 
             OrderItem orderItem = OrderItem.builder()
                     .order(order)
-                    .product(product)
+                    .product(cartItem.getProduct())
                     .quantity(quantity)
                     .priceAtPurchase(price)
                     .build();
@@ -75,14 +85,14 @@ public class OrderServiceImpl implements OrderService {
         order.setItems(orderItems);
         order.setTotalPrice(total);
 
-        Order savedOrder = orderRepository.save(order);
+        Order saved = orderRepository.save(order);
         orderItemRepository.saveAll(orderItems);
 
         cartItemRepository.deleteByCartId(cart.getId());
-        cart.getItems().clear();
 
-        return toOrderDTO(savedOrder);
+        return toOrderDTO(saved); // with address mapping included
     }
+
 
     @Override
     public List<OrderDTO> getUserOrders(String userEmail) {
@@ -151,16 +161,24 @@ public class OrderServiceImpl implements OrderService {
                         .build())
                 .collect(Collectors.toList());
 
+        Address address = order.getAddress();
+        AddressDTO addressDTO = AddressDTO.builder()
+                .id(address.getId())
+                .street(address.getStreet())
+                .city(address.getCity())
+                .state(address.getState())
+                .postalCode(address.getPostalCode())
+                .country(address.getCountry())
+                .type(address.getType())
+                .build();
+
         return OrderDTO.builder()
                 .id(order.getId())
                 .createdAt(order.getCreatedAt())
                 .totalPrice(order.getTotalPrice())
                 .status(order.getStatus().name())
                 .items(itemDTOs)
+                .address(addressDTO)
                 .build();
     }
-
-
-
-
 }
