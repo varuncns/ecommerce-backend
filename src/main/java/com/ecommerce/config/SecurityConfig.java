@@ -12,6 +12,8 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
+import com.ecommerce.security.OAuth2LoginSuccessHandler;
+
 @Configuration
 public class SecurityConfig {
 	
@@ -20,6 +22,9 @@ public class SecurityConfig {
 	
 	@Autowired
 	private JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
+	
+	@Autowired
+	private OAuth2LoginSuccessHandler oAuth2LoginSuccessHandler;
 	
 	@Bean
 	public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -37,7 +42,9 @@ public class SecurityConfig {
 	        	.requestMatchers("/admin/**","/user/admin/**").hasRole("ADMIN")
 	            .requestMatchers("/user/**").hasRole("USER")
 	            .anyRequest().authenticated()
-	        ).exceptionHandling(ex -> ex
+	        		).oauth2Login(oauth -> oauth
+	        	    .successHandler(oAuth2LoginSuccessHandler)
+	                ).exceptionHandling(ex -> ex
 	                .authenticationEntryPoint(jwtAuthenticationEntryPoint)
 	        )
 	        .sessionManagement(sess -> sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
