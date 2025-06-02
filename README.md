@@ -1,6 +1,11 @@
+<!-- Logo -->
+<p align="center">
+  <img src="https://raw.githubusercontent.com/varuncns/varuncns/main/cart.png" alt="Logo" width="120" />
+</p>
+
 # 🛒 E-commerce Backend
 
-A robust, modular, and production-ready backend for e-commerce platforms, built with **Spring Boot**, **MySQL**, and **JWT-based authentication**. The backend supports both admin and user roles, featuring a comprehensive set of modules for seamless e-commerce operations.
+A robust, modular, and production-ready backend for e-commerce platforms, built with **Spring Boot**, **MySQL**, and **JWT-based authentication**. The backend supports both admin and user roles, features Google OAuth login, and more.
 
 ---
 
@@ -8,7 +13,7 @@ A robust, modular, and production-ready backend for e-commerce platforms, built 
 
 - **Java 21**
 - **Spring Boot 3.4.5**
-- **Spring Security** (JWT-based authentication)
+- **Spring Security** (JWT-based authentication, **Google OAuth integration**)
 - **Hibernate (JPA)** & **MySQL**
 - **DTO Pattern** (Data Transfer Objects)
 - **Maven**
@@ -64,6 +69,8 @@ A robust, modular, and production-ready backend for e-commerce platforms, built 
 
 - **User & Admin Registration/Login**  
   Secure registration and login endpoints for users and admins with JWT-based authentication.
+- **Google OAuth Login**  
+  Users can log in with Google accounts for quick and secure authentication.
 
 - **Role-Based Access Control**  
   Fine-grained access via `ROLE_USER` and `ROLE_ADMIN`.
@@ -78,28 +85,28 @@ A robust, modular, and production-ready backend for e-commerce platforms, built 
   Management of product categories and product-category associations.
 
 - **Cart Management**  
-  - Each user has a cart.
-  - Endpoints to add, view, decrease quantity, or remove items.
-  - Cart is cleared automatically after successful order placement.
+    - Each user has a cart.
+    - Endpoints to add, view, decrease quantity, or remove items.
+    - Cart is cleared automatically after successful order placement.
 
 - **Order Management**  
-  - Place orders directly from the cart.
-  - Order includes total, timestamp, and item details.
-  - Status tracking: `PENDING`, `PAID`, `SHIPPED`, `DELIVERED`, `CANCELLED`.
-  - Endpoints for placing orders, viewing history, and updating status (admin).
+    - Place orders directly from the cart.
+    - Order includes total, timestamp, and item details.
+    - Status tracking: `PENDING`, `PAID`, `SHIPPED`, `DELIVERED`, `CANCELLED`.
+    - Endpoints for placing orders, viewing history, and updating status (admin).
 
 - **Address Module**  
-  - Manage multiple addresses per user.
-  - Add, update, or delete shipping/billing addresses.
+    - Manage multiple addresses per user.
+    - Add, update, or delete shipping/billing addresses.
 
 - **Inventory Check**  
-  - Automatic inventory validation during order placement.
-  - Prevents overselling of products.
+    - Automatic inventory validation during order placement.
+    - Prevents overselling of products.
 
 - **Admin Dashboard**  
-  - Comprehensive dashboard for admins with:
-    - Logistic details (order shipments, tracking, etc.)
-    - Revenue details (sales statistics, revenue breakdown)
+    - Comprehensive dashboard for admins with:
+        - Logistic details (order shipments, tracking, etc.)
+        - Revenue details (sales statistics, revenue breakdown)
 
 ### 📧 Communication & Monitoring
 
@@ -117,6 +124,9 @@ A robust, modular, and production-ready backend for e-commerce platforms, built 
 - **JWT-based Authentication**  
   Stateless, secure sessions with token-based auth.
 
+- **Google OAuth Integration**  
+  Allows users to authenticate using their Google accounts for enhanced security and usability.
+
 - **Role-based Route Protection**  
   Protects sensitive endpoints; only admins can access admin APIs.
 
@@ -126,9 +136,9 @@ A robust, modular, and production-ready backend for e-commerce platforms, built 
 
 - **Dockerized** with deployment-ready Dockerfile.
 - **Google Cloud Platform Integration**
-  - Cloud SQL for managed MySQL
-  - Artifact Registry for images
-  - Cloud Run for serverless deployment
+    - Cloud SQL for managed MySQL
+    - Artifact Registry for images
+    - Cloud Run for serverless deployment
 
 **Sample Dockerfile:**
 ```dockerfile
