@@ -3,7 +3,7 @@
   <img src="https://raw.githubusercontent.com/varuncns/varuncns/main/cart.png" alt="Logo" width="120" />
 </p>
 
-# 🛒 E-commerce Backend
+# 🛒 Hi E-commerce Backend
 
 A robust, modular, and production-ready backend for e-commerce platforms, built with **Spring Boot**, **MySQL**, and **JWT-based authentication**. The backend supports both admin and user roles, features Google OAuth login, and more.
 
